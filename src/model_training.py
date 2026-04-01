@@ -139,7 +139,7 @@ class ModelTraining:
     
 if __name__ == "__main__":
     config = read_yaml(CONFIG_PATH)
-    model_trainer = ModelTraining(train_path=PROCESSED_TRAIN_DATA_PATH, test_path=PROCESSED_TEST_DATA_PATH, model_output_path=MODEL_OUPUT_PATH)
+    model_trainer = ModelTraining(train_path=PROCESSED_TRAIN_DATA_PATH, test_path=PROCESSED_TEST_DATA_PATH, model_output_path=MODEL_OUTPUT_PATH)
     best_model, X_test, y_test = model_trainer.run()
     y_pred = best_model.predict(X_test)
     acc = accuracy_score(y_test, y_pred)

@@ -22,4 +22,4 @@ PROCESSED_TEST_DATA_PATH = os.path.join(PROCESSED_DIR, 'processed_test.csv')
 
 ####### Model Training ######
 
-MODEL_OUPUT_PATH = os.path.join("artifacts", "Models", "lgbm_model.pkl")
+MODEL_OUTPUT_PATH = os.path.join("artifacts", "Models", "lgbm_model.pkl")
