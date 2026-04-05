@@ -37,7 +37,7 @@ pipeline{
                     echo 'Building and Pushing Docker Image to GCR (WIF).............'
                     sh '''
                     export PATH=$PATH:${GCLOUD_PATH}
-                    export GOOGLE_APPLICATION_CREDENTIALS=/root/credentials.json
+                    export GOOGLE_APPLICATION_CREDENTIALS=/var/jenkins_home/credentials.json
 
                     gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS
 
@@ -57,10 +57,11 @@ pipeline{
                     echo 'Deploy to Google Cloud Run.............'
                     sh '''
                     export PATH=$PATH:${GCLOUD_PATH}
-                    export GOOGLE_APPLICATION_CREDENTIALS=/root/credentials.json
+                    export GOOGLE_APPLICATION_CREDENTIALS=/var/jenkins_home/credentials.json
 
                     # Authenticate using WIF
                     gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS
+
 
                     gcloud config set project ${GCP_PROJECT}
 
