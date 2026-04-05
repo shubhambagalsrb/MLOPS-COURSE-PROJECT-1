@@ -66,18 +66,18 @@ pipeline{
                         echo 'Deploy to Google Cloud Run.............'
                         sh '''
                         export PATH=$PATH:${GCLOUD_PATH}
-
-
-                        gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
-
+                        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_CREDS
+        
+                        # Authenticate using WIF
+                        gcloud auth login --cred-file=$GOOGLE_CREDS
+        
                         gcloud config set project ${GCP_PROJECT}
-
+        
                         gcloud run deploy ml-project \
                             --image=gcr.io/${GCP_PROJECT}/ml-project:latest \
                             --platform=managed \
                             --region=us-central1 \
                             --allow-unauthenticated
-                            
                         '''
                     }
                 }
