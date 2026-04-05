@@ -3,7 +3,7 @@ pipeline{
 
     environment {
         VENV_DIR = 'venv'
-        GCP_PROJECT = "mlops-new-447207"
+        GCP_PROJECT = "project-bd45127e-4197-40d2-b33"
         GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
     }
 
@@ -12,7 +12,7 @@ pipeline{
             steps{
                 script{
                     echo 'Cloning Github repo to Jenkins............'
-                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-token', url: 'https://github.com/data-guru0/MLOPS-COURSE-PROJECT-1.git']])
+                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Github-token', url: 'https://github.com/shubhambagalsrb/MLOPS-COURSE-PROJECT-1.git']])
                 }
             }
         }
@@ -32,25 +32,27 @@ pipeline{
         }
 
         stage('Building and Pushing Docker Image to GCR'){
-            steps{
-                withCredentials([file(credentialsId: 'gcp-key' , variable : 'GOOGLE_APPLICATION_CREDENTIALS')]){
-                    script{
-                        echo 'Building and Pushing Docker Image to GCR.............'
-                        sh '''
-                        export PATH=$PATH:${GCLOUD_PATH}
+    steps{
+        withCredentials([file(credentialsId: 'gcp-wif', variable: 'GOOGLE_CREDS')]){
+            script{
+                echo 'Building and Pushing Docker Image to GCR (WIF).............'
+                sh '''
+                export PATH=$PATH:${GCLOUD_PATH}
 
+                # 🔐 Authenticate using WIF
+                gcloud auth login --cred-file=$GOOGLE_CREDS
 
-                        gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+                gcloud config set project ${GCP_PROJECT}
 
-                        gcloud config set project ${GCP_PROJECT}
+                # Configure docker auth
+                gcloud auth configure-docker --quiet
 
-                        gcloud auth configure-docker --quiet
+                # Build image
+                docker build -t gcr.io/${GCP_PROJECT}/ml-project:latest .
 
-                        docker build -t gcr.io/${GCP_PROJECT}/ml-project:latest .
-
-                        docker push gcr.io/${GCP_PROJECT}/ml-project:latest 
-
-                        '''
+                # Push image
+                docker push gcr.io/${GCP_PROJECT}/ml-project:latest
+                '''
                     }
                 }
             }
@@ -59,7 +61,7 @@ pipeline{
 
         stage('Deploy to Google Cloud Run'){
             steps{
-                withCredentials([file(credentialsId: 'gcp-key' , variable : 'GOOGLE_APPLICATION_CREDENTIALS')]){
+                withCredentials([file(credentialsId: 'gcp-wif', variable: 'GOOGLE_CREDS')]){
                     script{
                         echo 'Deploy to Google Cloud Run.............'
                         sh '''
