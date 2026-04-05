@@ -33,27 +33,19 @@ pipeline{
 
         stage('Building and Pushing Docker Image to GCR'){
     steps{
-        withCredentials([file(credentialsId: 'gcp-wif', variable: 'GOOGLE_CREDS')]){
-            script{
-                echo 'Building and Pushing Docker Image to GCR (WIF).............'
-                sh '''
-                export PATH=$PATH:${GCLOUD_PATH}
+        script{
+                    echo 'Building and Pushing Docker Image to GCR (WIF).............'
+                    sh '''
+                    export PATH=$PATH:${GCLOUD_PATH}
+                    export GOOGLE_APPLICATION_CREDENTIALS=/root/credentials.json
 
-                # 🔐 Authenticate using WIF
-                gcloud auth login --cred-file=$GOOGLE_CREDS
+                    gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS
 
-                gcloud config set project ${GCP_PROJECT}
-
-                # Configure docker auth
-                gcloud auth configure-docker --quiet
-
-                # Build image
-                docker build -t gcr.io/${GCP_PROJECT}/ml-project:latest .
-
-                # Push image
-                docker push gcr.io/${GCP_PROJECT}/ml-project:latest
-                '''
-                    }
+                    gcloud config set project ${GCP_PROJECT}
+                    gcloud auth configure-docker --quiet
+                    docker build -t gcr.io/${GCP_PROJECT}/ml-project:latest .
+                    docker push gcr.io/${GCP_PROJECT}/ml-project:latest
+                    '''
                 }
             }
         }
@@ -61,25 +53,23 @@ pipeline{
 
         stage('Deploy to Google Cloud Run'){
             steps{
-                withCredentials([file(credentialsId: 'gcp-wif', variable: 'GOOGLE_CREDS')]){
-                    script{
-                        echo 'Deploy to Google Cloud Run.............'
-                        sh '''
-                        export PATH=$PATH:${GCLOUD_PATH}
-                        export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_CREDS
-        
-                        # Authenticate using WIF
-                        gcloud auth login --cred-file=$GOOGLE_CREDS
-        
-                        gcloud config set project ${GCP_PROJECT}
-        
-                        gcloud run deploy ml-project \
-                            --image=gcr.io/${GCP_PROJECT}/ml-project:latest \
-                            --platform=managed \
-                            --region=us-central1 \
-                            --allow-unauthenticated
-                        '''
-                    }
+                script{
+                    echo 'Deploy to Google Cloud Run.............'
+                    sh '''
+                    export PATH=$PATH:${GCLOUD_PATH}
+                    export GOOGLE_APPLICATION_CREDENTIALS=/root/credentials.json
+
+                    # Authenticate using WIF
+                    gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS
+
+                    gcloud config set project ${GCP_PROJECT}
+
+                    gcloud run deploy ml-project \
+                        --image=gcr.io/${GCP_PROJECT}/ml-project:latest \
+                        --platform=managed \
+                        --region=us-central1 \
+                        --allow-unauthenticated
+                    '''
                 }
             }
         }
