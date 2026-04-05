@@ -1,0 +1,31 @@
+Steps to do CI CD 
+
+1. Setup Jenkins Container
+2. Github Integration
+3. Dockerization of PROJECT
+4. Create a Venv in your Jenkins
+5. Build Docker Image of your Project -> push to Google Cloud Registry
+6. Extract image from GCR -> push to google cloud run 
+
+
+
+after image created 
+
+docker run -d --name jenkins-dind ^
+--privileged ^
+-p 8080:8080 -p 50000:50000 ^
+-v //var/run/docker.sock:/var/run/docker.sock ^
+-v jenkins_home:/var/jenkins_home ^
+jenkins-dind
+
+
+--------------setup jenkins Container-------------
+docker exec -u root -it jenkins-dind bash
+apt update -y
+apt install -y python3
+python3 --version
+ln -s /usr/bin/python3 /usr/bin/python
+python --version
+apt install -y python3-pip
+apt install -y python3-venv
+exit
