@@ -1,5 +1,5 @@
 pipeline{
-    agennt any 
+    agent any 
 
     stages{
         stage('Cloning Github repo to Jenkins'){
